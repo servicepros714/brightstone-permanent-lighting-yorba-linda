@@ -1,0 +1,50 @@
+name: Deploy to Cloudflare Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: pages-deploy
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # No `cache: npm` — the repo ships without a package-lock.json.
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      # Repo secrets override .env.local when set. Empty/unset secrets are skipped so they never blank it out.
+      - name: Write build env from secrets (if set)
+        shell: bash
+        env:
+          PK: ${{ secrets.VITE_STRIPE_PUBLISHABLE_KEY }}
+          API: ${{ secrets.VITE_API_BASE }}
+        run: |
+          : > .env.production.local
+          if [ -n "$PK" ]; then echo "VITE_STRIPE_PUBLISHABLE_KEY=$PK" >> .env.production.local; fi
+          if [ -n "$API" ]; then echo "VITE_API_BASE=$API" >> .env.production.local; fi
+
+      - name: Build
+        run: npm run build
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy dist --project-name=brightstone-permanent-lighting-yorba-linda --branch=main

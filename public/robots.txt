@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /checkout
+Disallow: /confirmation
+
+Sitemap: https://brightstone-permanent-lighting-yorba-linda.pages.dev/sitemap.xml
