@@ -46,20 +46,20 @@ export default function Hero({ earliest, season }) {
       </div>
 
       <div className="container hero__foot">
-        <div className="ledger" role="list">
-          <Link to="/book?type=permanent" className="ledger__cell" role="listitem">
+        <div className="ledger">
+          <Link to="/book?type=permanent" className="ledger__cell">
             <span className="ledger__k">Permanent</span>
             <span className="ledger__v">Year-round roofline lighting</span>
             <span className="ledger__go">Start <Arrow width={16} height={16} /></span>
           </Link>
-          <Link to="/book?type=seasonal" className="ledger__cell" role="listitem">
+          <Link to="/book?type=seasonal" className="ledger__cell">
             <span className="ledger__k">Seasonal</span>
             <span className="ledger__v">Install · maintain · takedown</span>
             <span className="ledger__go">Start <Arrow width={16} height={16} /></span>
           </Link>
-          <div className="ledger__cell ledger__cell--info" role="listitem">
+          <div className="ledger__cell ledger__cell--info">
             <span className="ledger__k">Season {fmtMonDay(season.start)} – {fmtMonDay(season.end)}</span>
-            <span className="ledger__v">{earliest ? <>Earliest open: <span className="gold">{fmtShort(earliest)}</span></> : 'Checking open dates…'}</span>
+            <span className="ledger__v">{earliest ? <>Earliest open: <span className="gold">{fmtShort(earliest)}</span></> : 'Call for open dates'}</span>
           </div>
         </div>
 

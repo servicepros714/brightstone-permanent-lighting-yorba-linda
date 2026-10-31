@@ -14,7 +14,7 @@ Vite + React site with a 6-step booking calendar, Stripe deposit checkout, and a
 
 Edit **`src/config/site.js`**. Search it for `TODO`:
 
-- **Phone** — `555-555-555` is only 9 digits. Put the real number in `phoneDisplay` and `phoneHref`, and also in `index.html` (JSON-LD `telephone` and the `<noscript>` line).
+- **Phone and hours** — set in `phoneDisplay`, `phoneHref` and `hours`. If they change, also update `index.html` (JSON-LD `telephone`, `openingHoursSpecification` and the `<noscript>` line).
 - **Prices** — `price: null` shows "Online quoting". Set a number to show "Starting at $X".
 - **Reviews** — `REVIEWS` is empty, so the section shows service commitments instead. Paste real reviews only.
 - **Gallery** — the 9 images are illustrated design previews, labeled "Design preview" on the site. Swap in photos of real installs and set `preview: false`.

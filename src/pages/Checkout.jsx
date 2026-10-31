@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements, ExpressCheckoutElement, PaymentElement, useElements, useStripe } from '@stripe/react-stripe-js';
-import { BUSINESS, DEPOSIT } from '../config/site.js';
+import { BUSINESS, DEPOSIT, TWO_STORY_PERCENT } from '../config/site.js';
 import { apiConfigured, createPaymentIntent } from '../lib/api.js';
 import {
   PI_KEY, estimate, finishBooking, firstIncomplete, formatPhone, money, packageOf, selectedAddons, typeOf, useBooking, windowOf,
@@ -49,6 +49,7 @@ export default function Checkout() {
   const params = new URLSearchParams(search);
   const returnedPi = params.get('payment_intent');
   const redirectStatus = params.get('redirect_status');
+  const paidReturn = Boolean(returnedPi) && (redirectStatus === 'succeeded' || redirectStatus === 'processing');
   const complete = firstIncomplete(b) === 6;
 
   // Incomplete booking → back to the first missing step (unless returning from a Stripe redirect).
@@ -60,8 +61,8 @@ export default function Checkout() {
   useEffect(() => {
     if (!returnedPi || handled.current) return;
     handled.current = true;
-    if (redirectStatus === 'succeeded' || redirectStatus === 'processing') {
-      save('Paid', returnedPi);
+    if (paidReturn) {
+      if (complete) save('Paid', returnedPi);
     } else {
       setSaveError({ msg: 'Your payment wasn’t completed. You can try again or choose to pay at the visit.' });
       navigate('/checkout', { replace: true });
@@ -87,7 +88,7 @@ export default function Checkout() {
       .catch((e) => live && setPiError(e.message || 'Card payment is unavailable right now.'));
     return () => { live = false; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [complete, b.ref]);
+  }, [complete, b.ref, returnedPi]);
 
   async function save(status, piId) {
     setBusy(status);
@@ -100,6 +101,9 @@ export default function Checkout() {
         setSaveError({ msg: 'Sorry — that time window was just booked by someone else. Please pick another window.', slot: true });
       } else if (status === 'Paid') {
         setSaveError({ msg: `Your payment went through, but we couldn’t save the booking (${e.message}). Tap “Try again”, or call ${BUSINESS.phoneDisplay} and mention reference ${b.ref}.`, retry: piId });
+        // Keep the paid state in the URL so a reload retries the save instead of offering payment again.
+        handled.current = true;
+        navigate(`/checkout?payment_intent=${encodeURIComponent(piId)}&redirect_status=succeeded`, { replace: true });
       } else {
         setSaveError({ msg: e.message || 'We couldn’t save your booking. Please try again or call us.' });
       }
@@ -111,6 +115,17 @@ export default function Checkout() {
   if (returnedPi && busy) {
     return (
       <section className="checkout"><div className="container"><p className="checkout__finalizing">Finalizing your booking…</p></div></section>
+    );
+  }
+  if (paidReturn && !complete) {
+    return (
+      <section className="checkout">
+        <div className="container">
+          <div className="alert" role="alert">
+            <p>Your payment went through, but this browser no longer has your booking details. Please call {BUSINESS.phoneDisplay} and mention payment {returnedPi}.</p>
+          </div>
+        </div>
+      </section>
     );
   }
   if (!complete && !returnedPi) return null;
@@ -148,13 +163,15 @@ export default function Checkout() {
               </div>
               <span className="paycard__lock"><Lock width={16} height={16} /> Secured by Stripe</span>
             </div>
-            {options ? (
+            {options && !returnedPi ? (
               <Elements key={pi.clientSecret} stripe={getStripe()} options={options}>
                 <PayForm b={b} onPaid={(id) => save('Paid', id)} busy={busy === 'Paid'} />
               </Elements>
             ) : (
               <div className="paycard__state">
-                {!stripeReady || !apiConfigured()
+                {paidReturn
+                  ? <p>Your deposit has been received. We just need to finish saving your booking.</p>
+                  : !stripeReady || !apiConfigured()
                   ? <p>Card payment isn’t connected yet. You can still reserve below and pay at the visit.</p>
                   : piError
                     ? <p>{piError} You can still reserve below and pay at the visit.</p>
@@ -167,11 +184,13 @@ export default function Checkout() {
           <Summary b={b} />
         </div>
 
-        <p className="paylater">
-          <button type="button" className="paylater__link" onClick={() => save('Pay Later')} disabled={!!busy}>
-            {busy === 'Pay Later' ? 'Saving your booking…' : 'I’ll pay at the visit'}
-          </button>
-        </p>
+        {!paidReturn && (
+          <p className="paylater">
+            <button type="button" className="paylater__link" onClick={() => save('Pay Later')} disabled={!!busy}>
+              {busy === 'Pay Later' ? 'Saving your booking…' : 'I’ll pay at the visit'}
+            </button>
+          </p>
+        )}
       </div>
     </section>
   );
@@ -238,7 +257,7 @@ function Summary({ b }) {
       <p className="summary__title">Order summary</p>
       <ul className="summary__lines">
         <li><span>{t?.name} · {p?.name}</span><span className="summary__muted">{t?.id === 'permanent' || p?.price == null ? 'Online quoting' : money(p.price)}</span></li>
-        <li><span>{b.stories}-Story home</span><span className="summary__muted">{b.stories === '2' ? '+50%' : 'Included'}</span></li>
+        <li><span>{b.stories}-Story home</span><span className="summary__muted">{b.stories === '2' ? `+${TWO_STORY_PERCENT}%` : 'Included'}</span></li>
         {adds.map((a) => (
           <li key={a.id}><span>{a.name}</span><span className="summary__muted">{a.price == null ? 'Online quoting' : `+${money(a.price)}`}</span></li>
         ))}

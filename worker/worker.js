@@ -173,9 +173,10 @@ async function createBooking(request, env, cors) {
   const phone = String(b.phone || '').replace(/\D/g, '');
   const email = clip(b.email, 160).trim();
   const address = clip(b.address, 240).trim();
-  const ref = clip(b.ref, 40).trim();
+  // Both end up inside LIKE patterns below, so they can never carry wildcards.
+  const ref = clip(b.ref, 40).replace(/[^A-Za-z0-9-]/g, '');
   const wantsPaid = b.payment_status === 'Paid';
-  const piId = String(b.payment_intent_id || '').trim();
+  const piId = wantsPaid ? String(b.payment_intent_id || '').trim() : '';
 
   if (!LIGHTING_TYPES.includes(type)) return json({ error: 'Choose a lighting type: Permanent or Seasonal.' }, 400, cors);
   if (!PACKAGES.includes(service)) return json({ error: 'Choose a package.' }, 400, cors);
@@ -198,7 +199,7 @@ async function createBooking(request, env, cors) {
     }
     const okStatus = ['succeeded', 'processing', 'requires_capture'].includes(pi.status);
     const okAmount = Number(pi.amount) === DEPOSIT_CENTS && pi.currency === 'usd';
-    const okSource = !pi.metadata || !pi.metadata.source || pi.metadata.source === SOURCE;
+    const okSource = Boolean(pi.metadata) && pi.metadata.source === SOURCE;
     if (!okStatus || !okAmount || !okSource) return json({ error: 'Payment not completed.' }, 402, cors);
   }
 
@@ -314,7 +315,12 @@ async function readJson(request) {
 }
 const clip = (v, n) => (v == null ? '' : String(v)).slice(0, n);
 const validEmail = (s) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(String(s || '').trim());
-const isIsoDate = (s) => /^\d{4}-\d{2}-\d{2}$/.test(String(s || '')) && !Number.isNaN(Date.parse(`${s}T00:00:00Z`));
+// Round-trips through Date because Date.parse quietly accepts impossible days like Nov 31.
+function isIsoDate(s) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(String(s || ''))) return false;
+  const ms = Date.parse(`${s}T00:00:00Z`);
+  return !Number.isNaN(ms) && new Date(ms).toISOString().slice(0, 10) === s;
+}
 const pad = (n) => String(n).padStart(2, '0');
 function daysBetween(a, b) {
   return Math.round((Date.parse(`${b}T00:00:00Z`) - Date.parse(`${a}T00:00:00Z`)) / 86400000);

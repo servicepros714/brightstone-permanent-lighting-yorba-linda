@@ -19,7 +19,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # No `cache: npm` — the repo ships without a package-lock.json.
       - name: Set up Node
         uses: actions/setup-node@v4
         with:

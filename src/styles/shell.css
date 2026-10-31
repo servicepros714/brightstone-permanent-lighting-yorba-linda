@@ -81,7 +81,7 @@
 .sheet { position: fixed; inset: 0; z-index: 70; pointer-events: none; visibility: hidden; transition: visibility 0s linear 0.4s; }
 .sheet.is-open { pointer-events: auto; visibility: visible; transition-delay: 0s; }
 @media (min-width: 961px) { .sheet { display: none; } }
-.sheet__backdrop { position: absolute; inset: 0; border: 0; padding: 0; background: rgba(0, 0, 0, 0.6); opacity: 0; transition: opacity 0.3s; cursor: default; }
+.sheet__backdrop { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; padding: 0; background: rgba(0, 0, 0, 0.6); opacity: 0; transition: opacity 0.3s; cursor: default; }
 .sheet.is-open .sheet__backdrop { opacity: 1; }
 .sheet__panel {
   position: absolute; left: 0; right: 0; bottom: 0; max-height: 88svh; overflow-y: auto;

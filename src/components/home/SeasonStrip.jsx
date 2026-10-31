@@ -70,7 +70,7 @@ export default function SeasonStrip({ season, full, earliest, loaded }) {
                       <span className="day__num">{parseIso(x.d).d}</span>
                     </button>
                   ) : (
-                    <span className={cls} title={label} aria-label={label}><span className="day__num">{parseIso(x.d).d}</span></span>
+                    <span className={cls} role="img" title={label} aria-label={label}><span className="day__num">{parseIso(x.d).d}</span></span>
                   )}
                 </div>
               );

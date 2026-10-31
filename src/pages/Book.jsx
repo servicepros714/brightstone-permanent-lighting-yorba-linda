@@ -7,7 +7,7 @@ import {
 } from '../lib/booking.js';
 import { scrollTopNow } from '../lib/hooks.js';
 import {
-  addDays, currentSeason, dateOpen, fmtLong, fmtShort, iso, parseIso, todayPacific, weekday, windowOpen,
+  addDays, currentSeason, dateOpen, fmtLong, fmtShort, iso, parseIso, seasonDates, todayPacific, weekday, windowOpen,
 } from '../lib/time.js';
 import { ADDON_ICONS, Arrow, Back, Check, Chevron, Loop, Snow, Stories } from '../components/Icons.jsx';
 
@@ -47,7 +47,7 @@ export default function Book() {
       patch.type = t;
       patch.addons = b.addons.filter((id) => addonsFor(t).some((a) => a.id === id));
     }
-    if (d && /^\d{4}-\d{2}-\d{2}$/.test(d) && dateOpen(d)) { patch.date = d; patch.windowId = ''; }
+    if (d && seasonDates().includes(d) && dateOpen(d)) { patch.date = d; patch.windowId = ''; }
     if (Object.keys(patch).length) {
       update(patch);
       const next = { ...b, ...patch };
@@ -329,7 +329,7 @@ function DateStep({ b, update, reg }) {
         <button type="button" className="cal__nav" onClick={() => shift(1)} disabled={!canNext} aria-label="Next month"><Chevron style={{ transform: 'rotate(-90deg)' }} /></button>
       </div>
       <div className="cal__dow" aria-hidden="true">{['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((d) => <span key={d}>{d}</span>)}</div>
-      <div className="cal__grid" role="grid" aria-label={`${MONTHS[view.m - 1]} ${view.y}`}>
+      <div className="cal__grid" role="group" aria-label={`${MONTHS[view.m - 1]} ${view.y}`}>
         {cells.map((d, i) => {
           if (!d) return <span key={`x${i}`} className="cal__pad" />;
           const inSeason = d >= season.start && d <= season.end;

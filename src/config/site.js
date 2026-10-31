@@ -10,9 +10,9 @@ export const BUSINESS = {
   short: 'Brightstone',
   city: 'Yorba Linda',
   region: 'CA',
-  // TODO: "555-555-555" is 9 digits — replace with the real 10-digit number (display + tel link).
-  phoneDisplay: '555-555-555',
-  phoneHref: 'tel:555555555',
+  phoneDisplay: '714-970-4534',
+  phoneHref: 'tel:+17149704534',
+  hours: '6 AM – 8 PM, every day',
   // TODO: add the Google Business Profile review link once the profile is live.
   googleReviewUrl: '',
 };

@@ -33,7 +33,7 @@ export function useSectionNav() {
       if (pathname === '/') {
         const el = document.getElementById(id);
         if (el) el.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
-        window.history.replaceState(null, '', `#${id}`);
+        window.history.replaceState(window.history.state, '', `#${id}`);
       } else {
         navigate(`/#${id}`);
       }
@@ -49,6 +49,7 @@ export function Nav() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState('');
+  const closeMenu = useCallback(() => setOpen(false), []);
 
   useEffect(() => {
     const on = () => setScrolled(window.scrollY > 24);
@@ -113,7 +114,7 @@ export function Nav() {
           </div>
         </div>
       </header>
-      {!focus && <MenuSheet open={open} onClose={() => setOpen(false)} goSection={goSection} />}
+      {!focus && <MenuSheet open={open} onClose={closeMenu} goSection={goSection} />}
     </>
   );
 }
@@ -228,6 +229,7 @@ export function Footer() {
             <p className="foot__label">Contact</p>
             <a className="foot__phone" href={BUSINESS.phoneHref}>{BUSINESS.phoneDisplay}</a>
             <p className="foot__meta">{BUSINESS.city}, {BUSINESS.region}</p>
+            <p className="foot__meta">Open {BUSINESS.hours}</p>
             <p className="foot__meta">Install season Oct 20 – Dec 20</p>
           </div>
         </div>
