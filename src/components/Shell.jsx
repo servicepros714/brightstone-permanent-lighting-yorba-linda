@@ -237,6 +237,7 @@ export function Footer() {
       <div className="foot__legal">
         <span className="foot__bulbs" aria-hidden="true">{Array.from({ length: 9 }, (_, i) => <i key={i} />)}</span>
         <p>© {year} {BUSINESS.name} · {BUSINESS.city}, {BUSINESS.region}</p>
+        <p className="foot__policies"><Link to="/privacy">Privacy Policy</Link> · <Link to="/terms">Terms &amp; Conditions</Link></p>
       </div>
     </footer>
   );

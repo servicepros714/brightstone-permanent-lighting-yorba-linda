@@ -6,12 +6,15 @@ import Home from './pages/Home.jsx';
 import Book from './pages/Book.jsx';
 import Checkout from './pages/Checkout.jsx';
 import Confirmation from './pages/Confirmation.jsx';
+import { Privacy, Terms } from './pages/Legal.jsx';
 import NotFound from './pages/NotFound.jsx';
 
 const TITLES = {
   '/book': 'Book Your Install | Brightstone Permanent Lighting',
   '/checkout': 'Checkout | Brightstone Permanent Lighting',
   '/confirmation': 'Booking Confirmed | Brightstone Permanent Lighting',
+  '/privacy': 'Privacy Policy | Brightstone Permanent Lighting',
+  '/terms': 'Terms & Conditions | Brightstone Permanent Lighting',
 };
 const HOME_TITLE = document.title;
 
@@ -37,6 +40,8 @@ export default function App() {
           <Route path="/book" element={<Book />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/confirmation" element={<Confirmation />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>

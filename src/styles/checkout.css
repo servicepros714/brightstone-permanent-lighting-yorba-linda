@@ -51,6 +51,8 @@
 .paylater__link { appearance: none; border: 0; background: transparent; padding: 8px 4px; font-size: 16px; font-weight: 600; color: var(--muted-s); text-decoration: underline; text-underline-offset: 4px; text-decoration-color: #b5aa98; }
 .paylater__link:hover:not(:disabled) { color: var(--ink); text-decoration-color: var(--ink); }
 .paylater__link:disabled { opacity: 0.6; cursor: wait; }
+.checkout__legal { text-align: center; margin-top: 14px; font-size: 13.5px; color: var(--muted-s); }
+.checkout__legal a { text-decoration: underline; text-underline-offset: 3px; }
 
 .alert { max-width: 1040px; margin: 0 auto 20px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 16px; border-radius: 14px; background: #fdecea; color: var(--danger); font-weight: 600; }
 

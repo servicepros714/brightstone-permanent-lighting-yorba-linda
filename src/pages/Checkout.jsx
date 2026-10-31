@@ -191,6 +191,9 @@ export default function Checkout() {
             </button>
           </p>
         )}
+        <p className="checkout__legal">
+          By reserving, you agree to our <Link to="/terms">Terms &amp; Conditions</Link> and <Link to="/privacy">Privacy Policy</Link>.
+        </p>
       </div>
     </section>
   );
